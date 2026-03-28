@@ -28,7 +28,7 @@ export default function App() {
         ].join(" ")}
         aria-hidden={activeView !== "chat"}
       >
-        <ChatbotView />
+        <ChatbotView onBackToLanding={() => setActiveView("landing")} />
       </div>
     </div>
   );
