@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "Growth Manager Connector",
+  "version": "1.0.0",
+  "description": "Lee un dashboard de ventas y lo envía a n8n para recibir consejos estratégicos.",
+  "icons": {
+    "16": "icon.svg",
+    "48": "icon.svg",
+    "128": "icon.svg"
+  },
+  "action": {
+    "default_icon": {
+      "16": "icon.svg",
+      "48": "icon.svg",
+      "128": "icon.svg"
+    },
+    "default_title": "Growth Manager Connector",
+    "default_popup": "popup.html"
+  },
+  "permissions": ["activeTab", "scripting"],
+  "host_permissions": ["https://k1000o.app.n8n.cloud/*"]
+}

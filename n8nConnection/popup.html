@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Growth Manager Connector</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #0f172a;
+        --panel: #111827;
+        --panel-2: #1f2937;
+        --text: #e5e7eb;
+        --muted: #94a3b8;
+        --accent: #22c55e;
+        --accent-hover: #16a34a;
+        --danger: #ef4444;
+        --border: rgba(148, 163, 184, 0.22);
+      }
+
+      body {
+        margin: 0;
+        min-width: 360px;
+        font-family: Arial, sans-serif;
+        background: linear-gradient(180deg, var(--bg), #020617);
+        color: var(--text);
+      }
+
+      .container {
+        padding: 16px;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: 16px;
+      }
+
+      p {
+        margin: 0 0 12px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.4;
+      }
+
+      button {
+        width: 100%;
+        border: 0;
+        border-radius: 10px;
+        padding: 12px 14px;
+        font-weight: 700;
+        color: #052e16;
+        background: var(--accent);
+        cursor: pointer;
+        transition: background 0.2s ease, transform 0.08s ease;
+      }
+
+      button:hover {
+        background: var(--accent-hover);
+      }
+
+      button:active {
+        transform: translateY(1px);
+      }
+
+      button:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+      }
+
+      .status {
+        margin: 10px 0;
+        min-height: 18px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .status.error {
+        color: var(--danger);
+      }
+
+      .markdown-output {
+        width: 100%;
+        min-height: 220px;
+        box-sizing: border-box;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 12px;
+        background: var(--panel);
+        color: var(--text);
+        font-size: 12px;
+        line-height: 1.5;
+        white-space: normal;
+        overflow: auto;
+      }
+
+      .markdown-output:empty::before {
+        content: attr(data-placeholder);
+        color: var(--muted);
+      }
+
+      .markdown-output h1,
+      .markdown-output h2,
+      .markdown-output h3 {
+        margin: 0.6em 0 0.35em;
+        line-height: 1.2;
+      }
+
+      .markdown-output h1 {
+        font-size: 1.25em;
+      }
+
+      .markdown-output h2 {
+        font-size: 1.1em;
+      }
+
+      .markdown-output h3 {
+        font-size: 1em;
+      }
+
+      .markdown-output p {
+        margin: 0 0 0.75em;
+        color: inherit;
+      }
+
+      .markdown-output ul,
+      .markdown-output ol {
+        margin: 0 0 0.75em 1.2em;
+        padding: 0;
+      }
+
+      .markdown-output li {
+        margin: 0.2em 0;
+      }
+
+      .markdown-output code {
+        padding: 0.15em 0.35em;
+        border-radius: 6px;
+        background: rgba(148, 163, 184, 0.16);
+        font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+        font-size: 0.95em;
+      }
+
+      .markdown-output pre {
+        margin: 0 0 0.75em;
+        padding: 10px;
+        border-radius: 10px;
+        overflow: auto;
+        background: rgba(15, 23, 42, 0.7);
+      }
+
+      .markdown-output pre code {
+        padding: 0;
+        background: transparent;
+        white-space: pre-wrap;
+      }
+
+      .markdown-output blockquote {
+        margin: 0 0 0.75em;
+        padding-left: 12px;
+        border-left: 3px solid rgba(34, 197, 94, 0.45);
+        color: var(--muted);
+      }
+
+      .chat-panel {
+        display: none;
+        margin-top: 12px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: rgba(17, 24, 39, 0.65);
+        overflow: hidden;
+      }
+
+      .chat-panel.visible {
+        display: block;
+      }
+
+      .chat-header {
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--border);
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--text);
+        background: rgba(31, 41, 55, 0.55);
+      }
+
+      .chat-transcript {
+        max-height: 260px;
+        overflow: auto;
+        padding: 12px;
+        display: grid;
+        gap: 10px;
+      }
+
+      .chat-empty {
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.4;
+      }
+
+      .chat-message {
+        max-width: 100%;
+        border-radius: 12px;
+        padding: 10px 12px;
+        font-size: 12px;
+        line-height: 1.5;
+        white-space: normal;
+        overflow-wrap: anywhere;
+      }
+
+      .chat-message.user {
+        margin-left: 24px;
+        background: rgba(34, 197, 94, 0.12);
+        border: 1px solid rgba(34, 197, 94, 0.2);
+        color: var(--text);
+      }
+
+      .chat-message.assistant {
+        margin-right: 24px;
+        background: rgba(148, 163, 184, 0.08);
+        border: 1px solid rgba(148, 163, 184, 0.16);
+      }
+
+      .chat-message p {
+        margin: 0 0 0.75em;
+        color: inherit;
+      }
+
+      .chat-message p:last-child {
+        margin-bottom: 0;
+      }
+
+      .chat-message ul,
+      .chat-message ol {
+        margin: 0 0 0.75em 1.2em;
+        padding: 0;
+      }
+
+      .chat-message li {
+        margin: 0.2em 0;
+      }
+
+      .chat-composer {
+        display: grid;
+        gap: 8px;
+        padding: 12px;
+        border-top: 1px solid var(--border);
+        background: rgba(15, 23, 42, 0.55);
+      }
+
+      .chat-composer textarea {
+        width: 100%;
+        min-height: 72px;
+        box-sizing: border-box;
+        resize: vertical;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 10px 12px;
+        background: var(--panel);
+        color: var(--text);
+        font-size: 12px;
+        line-height: 1.4;
+        outline: none;
+      }
+
+      .chat-composer textarea::placeholder {
+        color: var(--muted);
+      }
+
+      .chat-actions {
+        display: flex;
+        gap: 8px;
+      }
+
+      .chat-actions button {
+        width: auto;
+        flex: 1;
+      }
+
+      .footer {
+        margin-top: 10px;
+        font-size: 11px;
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Growth Manager Connector</h1>
+      <p>Lee el dashboard activo y lo envía a n8n para recibir recomendaciones estratégicas.</p>
+      <button id="analyzeBtn">Analizar Dashboard</button>
+      <div id="status" class="status"></div>
+      <div
+        id="result"
+        class="markdown-output"
+        data-placeholder="Aquí aparecerá la respuesta del Growth Manager en formato Markdown básico."
+      ></div>
+      <section id="chatPanel" class="chat-panel" aria-live="polite">
+        <div class="chat-header">Chat con el bot</div>
+        <div id="chatTranscript" class="chat-transcript">
+          <div id="chatEmpty" class="chat-empty">
+            Primero analiza el dashboard. Después podrás seguir hablando con el bot aquí.
+          </div>
+        </div>
+        <div class="chat-composer">
+          <textarea
+            id="chatInput"
+            placeholder="Escribe tu pregunta o instrucción para el Growth Manager..."
+            disabled
+          ></textarea>
+          <div class="chat-actions">
+            <button id="sendBtn" disabled>Enviar</button>
+          </div>
+        </div>
+      </section>
+      <div class="footer">Webhook: n8n Growth Analysis</div>
+    </div>
+    <script src="popup.js"></script>
+  </body>
+</html>
